@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" class="has-background-black-bis has-text-light">
+<head>
+    <meta charset="UTF-8">
+    <link 
+        href="https://lib.arvancloud.ir/bulma/0.9.4/css/bulma-rtl.css " 
+        rel="stylesheet">
+    <title>{% block title %} {% endblock %}</title>
+</head>
+
+<body class="has-background-black-bis has-text-light">
+
+    {% include 'incs/navbar.html' %}
+    <br>
+    {% include 'incs/messages.html' %}
+    <br>
+    {% block content %} {% endblock %}
+
+</body>
+</html>
