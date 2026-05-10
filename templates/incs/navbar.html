@@ -24,9 +24,9 @@
       <ul class="dropdown-menu dropdown-menu-end" data-bs-theme="dark">
         {% if request.user.is_authenticated %}
           <li><a class="dropdown-item" href="#">Profile</a></li>
-          <li><a class="dropdown-item text-danger" href="#">Logout</a></li>
+          <li><a class="dropdown-item text-danger" href="{% url 'accounts:user-logout' %}">Logout</a></li>
         {% else %}
-          <li><a class="dropdown-item" href="#">Login</a></li>
+          <li><a class="dropdown-item" href="{% url 'accounts:user-login' %}">Login</a></li>
           <li><a class="dropdown-item" href="{% url 'accounts:user-register' %}">SignUp</a></li>
         {% endif %}
       </ul>

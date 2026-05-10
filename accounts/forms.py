@@ -27,3 +27,12 @@ class UserRegistrationForm(forms.ModelForm):
             raise ValidationError("This username already taken please try another one...")
         
         return username
+        
+        
+class UserLoginForm(forms.Form):
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter your email'}
+    ))
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter password'}
+    ))
