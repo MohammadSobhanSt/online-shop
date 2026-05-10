@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %} {{ user.username }} {% endblock %}
+
+{% block content %}
+
+
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <a class="btn btn-warning" href="{% url 'accounts:edit-profile' %}">Edit Profile</a>
+                <a class="btn btn-danger" href="{% url 'accounts:user-delete' %}">Delete Account</a>
+            </div>
+            <p class="text-center"><strong>Username:</strong> {{ user.username }}</p>
+            <p class="text-center"><strong>Email:</strong> {{ user.email }}</p>
+        </div>
+    </div>
+
+{% endblock %}

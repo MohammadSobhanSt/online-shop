@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %} Acount Delete Confirmation {% endblock %}
+
+
+{% block content %}
+
+    <form action="" method="post" class="text-center">
+        {% csrf_token %}
+        <p class="text-light">Are you sure you want to delete Your account?</p>
+        <button class="btn btn-danger" type="submit">Delete Account</button>
+    </form>
+    
+{% endblock %}

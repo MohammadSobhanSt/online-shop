@@ -1,8 +1,8 @@
 from django.contrib import messages
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from .models import CustomUser
 from django.views import View
-from .forms import UserRegistrationForm, UserLoginForm
+from .forms import UserRegistrationForm, UserLoginForm, UserProfileEditForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -69,3 +69,44 @@ class UserLogoutView(LoginRequiredMixin, View):
         logout(request)
         messages.success(request, "You logged out successfully. We hope you come back soon :).")
         return redirect('home:home')
+        
+        
+        
+class UserProfileView(LoginRequiredMixin, View):
+    template_name = 'accounts/profile.html'
+    
+    def get(self, request):
+        user = get_object_or_404(CustomUser, username=request.user.username, email=request.user.email)
+        return render(request, self.template_name, {"user":user})
+        
+        
+class UserProfileEditView(LoginRequiredMixin, View):
+    form_class = UserProfileEditForm
+    template_name = "accounts/profile_edit.html"
+
+    def get(self, request):
+        user = get_object_or_404(CustomUser, username=request.user.username, email=request.user.email)
+        form = self.form_class(instance=user)
+        return render(request, self.template_name, {"form":form})
+        
+    def post(self, request):
+        user = get_object_or_404(CustomUser, username=request.user.username, email=request.user.email)
+        form = self.form_class(request.POST, instance=user)
+        if form.is_valid():
+            user.save()
+            messages.info(request, "Your profile updated successfully.", "info")
+            return redirect("accounts:user-profile")
+        return render(request, self.template_name, {"form":form})
+
+
+class UserDeleteView(LoginRequiredMixin, View):
+    template_name = 'accounts/user_confirm_delete.html'
+    
+    def get(self, request):
+        return render(request, self.template_name)
+        
+    def post(self, request):
+        user = request.user
+        user.delete()
+        messages.info(request, "Your account has been deleted successfully.", 'info')
+        return redirect("home:home")

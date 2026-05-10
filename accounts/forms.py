@@ -36,3 +36,14 @@ class UserLoginForm(forms.Form):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter password'}
     ))
+    
+    
+class UserProfileEditForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'email']
+        
+        widgets = {
+                    'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Choose a username'}),
+                    'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Choose an email'}),
+        }
