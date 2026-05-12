@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %} Confirmation {% endblock %}
+
+{% block content %}
+
+    <div class="container d-flex justify-content-center align-items-center" style="min-height: 30vh;">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <img src="{{ product.cover.url }}" alt="{{ product.tag }}" class="card-img-top">
+                <h5 class="card-title">{{ product.name }}</h5>
+                <p class="card-text">{{ product.description }}</p>
+                <p class="card-text"><strong>Price: {{ product.price }} IRT</strong></p>
+            </div>
+            <hr>
+            <form action="" method="post" class="text-center">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="btn btn-success" type="submit">Buy</button><br><br>
+            </form>
+        </div>
+    </div>
+
+
+{% endblock %}
