@@ -1,10 +1,10 @@
 from django import forms
-from .models import Product
+from .models import Purchase
 
 
 class BuyConfirmationForm(forms.ModelForm):
     class Meta:
-        model = Product
+        model = Purchase
         fields = ['quantity_user_want']
         
         widgets = {

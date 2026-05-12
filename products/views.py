@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from .forms import BuyConfirmationForm
-from .models import Product
+from .models import Product, Purchase
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 
@@ -20,29 +20,41 @@ class BuyConfirmationView(LoginRequiredMixin, View):
     form_class = BuyConfirmationForm
     
     def get(self, request, name):
-        form = self.form_class
+        form = self.form_class()
         product = get_object_or_404(Product, name=name)
-        return render(request, self.template_name, {"form":form, "product":product})
+        return render(request, self.template_name, {"form": form, "product": product})
         
     def post(self, request, name):
         form = self.form_class(request.POST)
         product = get_object_or_404(Product, name=name)
-
+        
         if form.is_valid():
             cd = form.cleaned_data
+            quantity_user_want = cd['quantity_user_want']
             
-            product.buyer.add(request.user)
-            product.quantity_user_want = cd['quantity_user_want']
+            if not product.is_in_stock(quantity_user_want):
+                messages.error(request, f"Only {product.product_count} items available", "danger")
+                return render(request, self.template_name, {'form': form, 'product': product})
+            
             try:
-                product.reduce_stock()
+                total_amount = product.price * quantity_user_want
+                
+                Purchase.objects.create(
+                    buyer=request.user,
+                    product=product,
+                    quantity_user_want=quantity_user_want,
+                    total_amount=total_amount
+                )
+                
+                product.reduce_stock(quantity_user_want)
+                
+                msg = 'Congrats. You bought this product. You can see your order tracking from your profile.'
+                messages.success(request, msg, 'success')
+                return redirect('accounts:user-profile')
+                
             except ValidationError as e:
                 messages.error(request, str(e), "danger")
                 return render(request, self.template_name, {'form': form, 'product': product})
                 
-            product.save()
-            msg = 'Congrats. You bought this product. You can see your order tracking from your profile.'
-            messages.success(request, msg, 'success')
-            return redirect('accounts:user-profile')
-            
-        messages.error(request, "There was an error during proccess.", "danger")
-        return render(request, self.template_name, {'form':form,'product': product})
+        messages.error(request, "There was an error during process.", "danger")
+        return render(request, self.template_name, {'form': form, 'product': product})
