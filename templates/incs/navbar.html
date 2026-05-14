@@ -4,17 +4,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <link href="{ static 'css/bootstrap.min.css'}" rel="stylesheet">
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
 </head>
 <body>
 
 <nav class="navbar navbar-dark bg-dark fixed-top">
   <div class="container-fluid">
-    <a class="navbar-brand" href="{% url 'home:home' %}">Home</a>
+    <div class="navbar-nav flex-row">
+      <a class="navbar-brand" href="{% url 'home:home' %}">Home</a>
+      <a class="nav-link" href="{% url 'products:all-products' %}">Products</a>
+    </div>
     
     <div class="dropdown">
-      <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+      <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
         {% if request.user.is_authenticated %}
           {{ request.user.username }}
         {% else %}
@@ -24,10 +26,11 @@
       <ul class="dropdown-menu dropdown-menu-end" data-bs-theme="dark">
         {% if request.user.is_authenticated %}
           <li><a class="dropdown-item" href="{% url 'accounts:user-profile' %}">Profile</a></li>
+          <li><hr class="dropdown-divider"></li>
           <li><a class="dropdown-item text-danger" href="{% url 'accounts:user-logout' %}">Logout</a></li>
         {% else %}
           <li><a class="dropdown-item" href="{% url 'accounts:user-login' %}">Login</a></li>
-          <li><a class="dropdown-item" href="{% url 'accounts:user-register' %}">SignUp</a></li>
+          <li><a class="dropdown-item" href="{% url 'accounts:user-register' %}">Sign Up</a></li>
         {% endif %}
       </ul>
     </div>
@@ -35,5 +38,6 @@
 </nav>
 
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+
 </body>
 </html>

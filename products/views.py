@@ -19,14 +19,22 @@ class BuyConfirmationView(LoginRequiredMixin, View):
     template_name = "products/buy_confirmation.html"
     form_class = BuyConfirmationForm
     
-    def get(self, request, name):
+    def dispatch(self, request, *args, **kwargs):
+        product = get_object_or_404(Product, slug=kwargs['product_slug'])
+        if product.product_count == 0:
+            return redirect('products:all-products')
+        
+        return super().dispatch(request, *args, **kwargs)
+    
+        
+    def get(self, request, product_slug):
         form = self.form_class()
-        product = get_object_or_404(Product, name=name)
+        product = get_object_or_404(Product, slug=product_slug)        
         return render(request, self.template_name, {"form": form, "product": product})
         
-    def post(self, request, name):
+    def post(self, request, product_slug):
         form = self.form_class(request.POST)
-        product = get_object_or_404(Product, name=name)
+        product = get_object_or_404(Product, slug=product_slug)
         
         if form.is_valid():
             cd = form.cleaned_data
