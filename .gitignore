@@ -222,3 +222,6 @@ __marimo__/
 images/
 
 migrations/
+
+
+.idea
