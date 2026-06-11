@@ -6,4 +6,6 @@ app_name = 'products'
 urlpatterns = [
     path('all/', views.ProductListView.as_view(), name="all-products"),
     path('confirm/<slug:product_slug>/', views.BuyConfirmationView.as_view(), name="buy-confirm"),
+    path('during-process/', views.DuringProcessView.as_view(), name="during-process"),
+    path('completed-process/', views.CompletedProcessView.as_view(), name="completed-process"),
 ]

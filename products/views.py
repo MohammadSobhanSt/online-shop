@@ -11,9 +11,9 @@ class ProductListView(View):
     template_name = 'products/product_list.html'
     
     def get(self, request):
-        products = Product.objects.all()
+        products = Product.objects.all().order_by("-product_count")
         return render(request, self.template_name, {'products':products})
-        
+
 
 class BuyConfirmationView(LoginRequiredMixin, View):
     template_name = "products/buy_confirmation.html"
@@ -22,8 +22,9 @@ class BuyConfirmationView(LoginRequiredMixin, View):
     def dispatch(self, request, *args, **kwargs):
         product = get_object_or_404(Product, slug=kwargs['product_slug'])
         if product.product_count == 0:
+            messages.info(request, "Product is no more available...", "info")
             return redirect('products:all-products')
-        
+
         return super().dispatch(request, *args, **kwargs)
     
         
@@ -51,7 +52,8 @@ class BuyConfirmationView(LoginRequiredMixin, View):
                     buyer=request.user,
                     product=product,
                     quantity_user_want=quantity_user_want,
-                    total_amount=total_amount
+                    total_amount=total_amount,
+                    during_process=True
                 )
                 
                 product.reduce_stock(quantity_user_want)
@@ -66,3 +68,19 @@ class BuyConfirmationView(LoginRequiredMixin, View):
                 
         messages.error(request, "There was an error during process.", "danger")
         return render(request, self.template_name, {'form': form, 'product': product})
+
+
+class DuringProcessView(LoginRequiredMixin, View):
+    template_name = "products/during_process.html"
+
+    def get(self, request):
+        items = Purchase.objects.filter(buyer=request.user, during_process=True).order_by('-bought_at')
+        return render(request, self.template_name, {"items":items})
+
+
+class CompletedProcessView(LoginRequiredMixin, View):
+    template_name = "products/completed_process.html"
+
+    def get(self, request):
+        items = Purchase.objects.filter(buyer=request.user, during_process=False).order_by('-bought_at')
+        return render(request, self.template_name, {"items":items})

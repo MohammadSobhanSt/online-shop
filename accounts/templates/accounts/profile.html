@@ -10,8 +10,8 @@
               Order Tracking
           </button>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item text-warning" href="#">During Process</a></li>
-            <li><a class="dropdown-item text-success" href="#">Bought</a></li>
+            <li><a class="dropdown-item text-warning" href="{% url 'products:during-process' %}">During Process</a></li>
+            <li><a class="dropdown-item text-success" href="{% url 'products:completed-process' %}">Completed</a></li>
           </ul>
         </div>
         <a class="btn btn-success" href="#">Favorites <i class="far fa-heart"></i></a>
