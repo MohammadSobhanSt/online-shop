@@ -94,8 +94,12 @@ class UserFavoritesListView(LoginRequiredMixin, View):
     template_name = "products/user_favorites.html"
 
     def get(self, request):
-        items = request.user.favorites.all()
-        return render(request, self.template_name, {"items":items})
+        user = request.user
+        user_liked_product_ids = set()
+        if user.is_authenticated:
+            user_liked_product_ids = set(user.favorites.values_list('product__pk', flat=True))
+        items = Favorite.objects.filter(user=request.user)
+        return render(request, self.template_name, {"items":items, "user_liked_product_ids":user_liked_product_ids})
 
 
 class MakeFavoriteView(LoginRequiredMixin, View):
@@ -113,4 +117,9 @@ class MakeFavoriteView(LoginRequiredMixin, View):
             like.is_liked = True
             messages.success(request, f"You liked \"{item.name}\". You can see your favorites from your your profile.")
 
-        return redirect("products:all-products")
+        referer = request.META.get('HTTP_REFERER', '')
+
+        if '/products/favorites/' in referer:
+            return redirect('products:user-favorites')
+        else:
+            return redirect("products:all-products")
