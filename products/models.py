@@ -38,6 +38,15 @@ class Purchase(models.Model):
     bought_at = models.DateTimeField(auto_now_add=True)
     during_process = models.BooleanField(default=False)
 
-    
     def __str__(self):
         return f"{self.buyer} bought: {self.product.name}, during process: {self.during_process}"
+
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="favorites")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user.username} liked \"{self.product.name}\""
+

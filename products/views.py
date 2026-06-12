@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from .forms import BuyConfirmationForm
-from .models import Product, Purchase
+from .models import Product, Purchase, Favorite
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 
@@ -11,8 +11,12 @@ class ProductListView(View):
     template_name = 'products/product_list.html'
     
     def get(self, request):
+        user = request.user
         products = Product.objects.all().order_by("-product_count")
-        return render(request, self.template_name, {'products':products})
+        user_liked_product_ids = set()
+        if user.is_authenticated:
+            user_liked_product_ids = set(user.favorites.values_list('product__pk', flat=True))
+        return render(request, self.template_name, {'products':products, "user_liked_product_ids":user_liked_product_ids})
 
 
 class BuyConfirmationView(LoginRequiredMixin, View):
@@ -55,17 +59,17 @@ class BuyConfirmationView(LoginRequiredMixin, View):
                     total_amount=total_amount,
                     during_process=True
                 )
-                
+
                 product.reduce_stock(quantity_user_want)
-                
+
                 msg = 'Congrats. You bought this product. You can see your order tracking from your profile.'
                 messages.success(request, msg, 'success')
                 return redirect('accounts:user-profile')
-                
+
             except ValidationError as e:
                 messages.error(request, str(e), "danger")
                 return render(request, self.template_name, {'form': form, 'product': product})
-                
+
         messages.error(request, "There was an error during process.", "danger")
         return render(request, self.template_name, {'form': form, 'product': product})
 
@@ -84,3 +88,29 @@ class CompletedProcessView(LoginRequiredMixin, View):
     def get(self, request):
         items = Purchase.objects.filter(buyer=request.user, during_process=False).order_by('-bought_at')
         return render(request, self.template_name, {"items":items})
+
+
+class UserFavoritesListView(LoginRequiredMixin, View):
+    template_name = "products/user_favorites.html"
+
+    def get(self, request):
+        items = request.user.favorites.all()
+        return render(request, self.template_name, {"items":items})
+
+
+class MakeFavoriteView(LoginRequiredMixin, View):
+    template_name = "products/product_list.html"
+
+    def post(self, request, product_pk):
+        item = get_object_or_404(Product, pk=product_pk)
+        like = Favorite.objects.filter(user=request.user, product=item)
+
+        if like.exists():
+            like.delete()
+            messages.error(request, f"You unliked \"{item.name}\".", "danger")
+        else:
+            like = Favorite.objects.create(user=request.user, product=item)
+            like.is_liked = True
+            messages.success(request, f"You liked \"{item.name}\". You can see your favorites from your your profile.")
+
+        return redirect("products:all-products")
