@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 
@@ -10,4 +10,7 @@ urlpatterns = [
     path('completed-process/', views.CompletedProcessView.as_view(), name="completed-process"),
     path("like-unlike/<int:product_pk>/", views.MakeFavoriteView.as_view(), name="product-like"),
     path("favorites/", views.UserFavoritesListView.as_view(), name="user-favorites"),
+    # API urls
+    path('api/v1/product/all/', views.AllProductsAPIView.as_view(), name='api-all-products'),
+    path('api/v1/product/<slug:product_slug>/', views.ProductRetrieveAPIView.as_view(), name='api-product-retrieve'),
 ]

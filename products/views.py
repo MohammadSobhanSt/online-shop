@@ -5,6 +5,8 @@ from .forms import BuyConfirmationForm
 from .models import Product, Purchase, Favorite
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from rest_framework import viewsets, generics
+from .serializer import ProductSerializer
 
 
 class ProductListView(View):
@@ -123,3 +125,19 @@ class MakeFavoriteView(LoginRequiredMixin, View):
             return redirect('products:user-favorites')
         else:
             return redirect("products:all-products")
+
+
+# API views
+class AllProductsAPIView(generics.ListAPIView):
+    queryset = Product.objects.all().order_by("-product_count")
+    serializer_class = ProductSerializer
+
+class ProductRetrieveAPIView(generics.RetrieveAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    lookup_field = 'slug'
+    lookup_url_kwarg = 'product_slug'
+
+    def get_object(self):
+        product_slug = self.kwargs.get('product_slug')
+        return get_object_or_404(Product, slug=product_slug)
