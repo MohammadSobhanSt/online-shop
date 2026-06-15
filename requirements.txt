@@ -2,6 +2,7 @@ appdirs==1.4.4
 asgiref==3.11.1
 Django==6.0.5
 django-autoslug==1.9.9
+djangorestframework==3.17.1
 fs==2.4.16
 inflection==0.5.1
 python-decouple==3.8
