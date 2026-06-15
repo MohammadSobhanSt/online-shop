@@ -12,5 +12,5 @@ class BuyConfirmationForm(forms.ModelForm):
         }
         
         labels = {
-            "quantity_user_want": "How much do you want"
+            "quantity_user_want": "How many do you want"
         }

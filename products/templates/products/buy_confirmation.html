@@ -18,7 +18,7 @@
                             {% else %}
                                 <h5 class="card-title">{{ product.name }}</h5>
                             {% endif %}
-                            <p class="card-text flex-grow-1">{{ product.description|truncatewords:10 }}</p>
+                            <p class="card-text flex-grow-1">{{ product.description }}</p>
                             <div class="mt-auto">
                                 <p><strong>Price: {{ product.price }} IRT</strong></p>
                                 <p><strong>We have {{ product.product_count }} of this product</strong></p>
