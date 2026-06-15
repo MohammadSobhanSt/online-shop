@@ -1,12 +1,13 @@
 from django.contrib import messages
-from django.db.models import Model
 from django.shortcuts import redirect, render, get_object_or_404
+from django.urls import reverse_lazy
 from .models import CustomUser, Confirm
 from .utilities import send_otp_email
 from django.views import View
 from .forms import UserRegistrationForm, UserLoginForm, UserProfileEditForm, EmailConfirmationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import views as auth_views
 
 
 class UserRegistrationView(View):
@@ -156,6 +157,25 @@ class UserProfileEditView(LoginRequiredMixin, View):
             messages.info(request, "Your profile updated successfully.", "info")
             return redirect("accounts:user-profile")
         return render(request, self.template_name, {"form":form})
+
+
+class UserPasswordResetView(auth_views.PasswordResetView):
+    template_name = "accounts/password_reset_form.html"
+    success_url = reverse_lazy("accounts:password_reset_done")
+    email_template_name = "accounts/password_reset_email.html"
+
+
+class UserPasswordResetDoneView(auth_views.PasswordResetDoneView):
+    template_name = "accounts/password_reset_done.html"
+
+
+class UserPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    template_name = "accounts/password_reset_confirm.html"
+    success_url = reverse_lazy("accounts:password_reset_complete")
+
+
+class UserPasswordResetCompleteView(auth_views.PasswordResetCompleteView):
+    template_name = "accounts/password_reset_complete.html"
 
 
 class UserDeleteView(LoginRequiredMixin, View):

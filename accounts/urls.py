@@ -24,4 +24,8 @@ urlpatterns = [
              template_name="accounts/password_change_done.html"
          ), 
          name='password_change_done'),
+    path("profile/reset/password/", views.UserPasswordResetView.as_view(), name="reset_password"),
+    path("profile/reset/password/done/", views.UserPasswordResetDoneView.as_view(), name="password_reset_done"),
+    path("profile/confirm/<uidb64>/<token>/", views.UserPasswordResetConfirmView.as_view(), name="password_reset_confirm"),
+    path("profile/reset/complete/", views.UserPasswordResetCompleteView.as_view(), name="password_reset_complete"),
 ]
