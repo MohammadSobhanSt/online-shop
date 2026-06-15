@@ -47,3 +47,7 @@ class UserProfileEditForm(forms.ModelForm):
                     'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Choose a username'}),
                     'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Choose an email'}),
         }
+
+
+class EmailConfirmationForm(forms.Form):
+    otp = forms.CharField(widget=forms.TextInput(attrs={"class":"form-control", "autofocus":"autofocus"}))

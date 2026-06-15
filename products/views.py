@@ -26,6 +26,13 @@ class BuyConfirmationView(LoginRequiredMixin, View):
     form_class = BuyConfirmationForm
     
     def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return super().dispatch(request, *args, **kwargs)
+
+        if not getattr(request.user, 'email_confirmed', False):
+            messages.warning(request, "You should confirm your email first :).", "warning")
+            return redirect("accounts:email-confirm")
+
         product = get_object_or_404(Product, slug=kwargs['product_slug'])
         if product.product_count == 0:
             messages.info(request, "Product is no more available...", "info")
