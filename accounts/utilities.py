@@ -12,10 +12,9 @@ def send_otp_email(request):
 
     subject = "Confirmation OTP"
     message = f"""Hello dear {request.user.username},
-    Welcome to our website!
-    Your OTP code for email verification is: {otp}
+    Your OTP code for email verification is: {otp}.
     This code will expire in 10 minutes.
-    If you didn't create an account with us, please ignore this email.
+    If you didn't request this, please ignore this email.
     """
     from_email = settings.DEFAULT_FROM_EMAIL
     to_email = [request.user.email]

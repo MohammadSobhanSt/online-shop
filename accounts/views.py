@@ -148,12 +148,18 @@ class UserProfileEditView(LoginRequiredMixin, View):
         user = get_object_or_404(CustomUser, username=request.user.username, email=request.user.email)
         form = self.form_class(instance=user)
         return render(request, self.template_name, {"form":form})
-        
+
     def post(self, request):
-        user = get_object_or_404(CustomUser, username=request.user.username, email=request.user.email)
-        form = self.form_class(request.POST, instance=user)
+        old_email = request.user.email
+        form = self.form_class(request.POST, instance=request.user)
         if form.is_valid():
-            user.save()
+            user = form.save()
+            if user.email != old_email:
+                user.email_confirmed = False
+                user.save(update_fields=["email_confirmed"])
+                send_otp_email(request)
+                messages.warning(request, "To use our services please confirm your email.", "warning")
+                return redirect("accounts:email-confirm")
             messages.info(request, "Your profile updated successfully.", "info")
             return redirect("accounts:user-profile")
         return render(request, self.template_name, {"form":form})
