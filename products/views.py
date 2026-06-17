@@ -5,8 +5,9 @@ from .forms import BuyConfirmationForm
 from .models import Product, Purchase, Favorite
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from rest_framework import viewsets, generics
-from .serializer import ProductSerializer
+from rest_framework import generics
+from .serializer import ProductSerializer, ProductCreateSerializer
+from .permissions import IsSeller
 
 
 class ProductListView(View):
@@ -139,6 +140,7 @@ class AllProductsAPIView(generics.ListAPIView):
     queryset = Product.objects.all().order_by("-product_count")
     serializer_class = ProductSerializer
 
+
 class ProductRetrieveAPIView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -148,3 +150,7 @@ class ProductRetrieveAPIView(generics.RetrieveAPIView):
     def get_object(self):
         product_slug = self.kwargs.get('product_slug')
         return get_object_or_404(Product, slug=product_slug)
+
+
+class ProductAddView(generics.CreateAPIView):
+    serializer_class = ProductCreateSerializer

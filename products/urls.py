@@ -1,5 +1,9 @@
-from django.urls import path, include
+from django.urls import path
 from . import views
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 
 app_name = 'products'
@@ -13,4 +17,5 @@ urlpatterns = [
     # API urls
     path('api/v1/product/all/', views.AllProductsAPIView.as_view(), name='api-all-products'),
     path('api/v1/product/<slug:product_slug>/', views.ProductRetrieveAPIView.as_view(), name='api-product-retrieve'),
+    path('api/v1/products/create/', views.ProductAddView.as_view(), name='api-product-create'),
 ]
