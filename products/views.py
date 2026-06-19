@@ -1,13 +1,18 @@
+from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
+from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
 from .forms import BuyConfirmationForm
 from .models import Product, Purchase, Favorite
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from rest_framework import generics
-from .serializer import ProductSerializer, ProductCreateSerializer
 from .permissions import IsSeller
+from rest_framework import generics, status
+from rest_framework.views import APIView
+from rest_framework.authentication import TokenAuthentication
+from .serializer import ProductSerializer, ProductCreateSerializer, CreateUserTokenSerializer
 
 
 class ProductListView(View):
@@ -153,4 +158,34 @@ class ProductRetrieveAPIView(generics.RetrieveAPIView):
 
 
 class ProductAddView(generics.CreateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsSeller]
     serializer_class = ProductCreateSerializer
+
+
+class UserAPILoginView(APIView):
+    serializer_class = CreateUserTokenSerializer
+
+    def post(self, request):
+        email = request.data.get("email")
+        password = request.data.get("password")
+
+        if not email or not password:
+            return Response(
+                {"error": "Both email and password are required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user = authenticate(request, email=email, password=password)
+
+        if user is not None and user.groups.filter(name="Seller").exists():
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({
+                "token": token.key,
+                "email": user.email,
+            }, status=status.HTTP_200_OK)
+
+        return Response({
+            "error": "Invalid credentials or permissions."},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
